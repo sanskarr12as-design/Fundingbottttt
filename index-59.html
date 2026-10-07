@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07101b">
+  <meta name="color-scheme" content="dark">
+  <title>Toobit Funding Bot</title>
+  <style>
+    :root{
+      --bg:#070c13;--panel:#0d1521;--panel2:#101b28;--line:#213145;--text:#edf4fb;--muted:#91a4b7;
+      --ok:#63e6be;--warn:#ffd166;--bad:#ff7181;--blue:#73a8ff;--r:16px;--shadow:0 16px 44px rgba(0,0,0,.28)
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:radial-gradient(900px 420px at 50% -12%,#173451 0,transparent 62%),var(--bg);color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{overflow-x:hidden}
+    button,input{font:inherit}
+    button{cursor:pointer;border:0}
+    .wrap{width:min(1180px,100%);margin:auto;padding:14px 12px 34px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .brand{display:flex;align-items:center;gap:9px;min-width:0}
+    .logo{width:40px;height:40px;flex:0 0 40px;border-radius:12px;display:grid;place-items:center;font-weight:900;background:linear-gradient(135deg,#1e6f68,#173a54);box-shadow:var(--shadow)}
+    .title{font-weight:850;letter-spacing:.15px;white-space:nowrap}.sub{color:var(--muted);font-size:11px}
+    .status{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--line);border-radius:999px;background:#09131f;font-size:11px;white-space:nowrap}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--bad)}.dot.ok{background:var(--ok);box-shadow:0 0 11px rgba(99,230,190,.45)}
+    .panel{background:linear-gradient(180deg,rgba(16,27,40,.98),rgba(10,18,28,.98));border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+    .panel-head{padding:13px 14px 11px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .panel-head h2{margin:0 0 2px;font-size:14px}.panel-body{padding:11px 13px}.pill{padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:#122131;color:var(--muted);font-size:10px;white-space:nowrap}
+    .notice{padding:10px 11px;border:1px solid var(--line);border-radius:11px;background:#101d2a;color:#bbcad8;font-size:11px}.notice strong{color:#fff}.notice.live{border-color:#6f5921;background:#2f250e;color:#ffe5a6}.notice.bad{border-color:#69323d;background:#28151a;color:#ffc2ca}
+    .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:10px;color:var(--muted)}
+    .field input{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--line);outline:none;background:#08121d;color:var(--text)}.field input:focus{border-color:#46779d}
+    .actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.btn{padding:9px 11px;border-radius:10px;background:#162638;border:1px solid var(--line);color:var(--text);font-weight:750;font-size:11px}.btn.primary{background:#15473e;border-color:#2b796a}.btn.danger{background:#49212a;border-color:#743441}.btn.warn{background:#4b391b;border-color:#755a22}.btn:disabled{opacity:.45;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:12px;margin-top:12px}
+    .table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:810px}.table th,.table td{padding:9px 8px;border-bottom:1px solid #182533;text-align:left;white-space:nowrap}.table th{font-size:10px;color:var(--muted);font-weight:650}.table td{font-size:11px}.rank{color:var(--muted);width:25px}.coin{font-weight:850}.pos{color:var(--ok)}.neg{color:var(--bad)}.score{color:var(--blue);font-weight:800}.tag{display:inline-flex;padding:4px 7px;border-radius:999px;font-size:9px;font-weight:850;border:1px solid var(--line)}.tag.short{background:#2a171c;color:#ffd6db}.tag.long{background:#102a25;color:#c9faed}
+    .row-actions button{padding:6px 8px;border-radius:8px;background:#152537;border:1px solid var(--line);color:var(--text);font-size:10px;font-weight:750}
+    .cards{display:none;padding:8px}.coin-card{padding:10px;border:1px solid var(--line);border-radius:12px;background:#0a141f;margin-bottom:8px}.coin-main{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.coin-name{font-size:14px;font-weight:850}.rate-big{font-size:15px;font-weight:900}.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.mini{padding:7px;border:1px solid rgba(255,255,255,.055);border-radius:9px;background:rgba(0,0,0,.09)}.mini b{display:block;font-size:11px}.mini span{display:block;color:var(--muted);font-size:9px;margin-top:1px}.coin-actions{display:flex;gap:6px;margin-top:8px}.coin-actions .btn{flex:1}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metric{padding:9px;border:1px solid var(--line);border-radius:11px;background:#0a1420}.metric .v{font-size:16px;font-weight:850}.metric .k{font-size:9px;color:var(--muted);margin-top:1px}
+    .position{padding:11px;border-radius:12px;border:1px solid #2d665b;background:linear-gradient(180deg,#0d2924,#0a1d19)}.position .big{font-size:18px;font-weight:900}.kv{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}.kv div{padding:7px;border-radius:9px;background:rgba(0,0,0,.12);border:1px solid rgba(255,255,255,.055)}.kv b{display:block;font-size:11px}.kv span{font-size:9px;color:var(--muted)}
+    .stack{display:flex;flex-direction:column;gap:10px}.logs{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto}.log{padding:8px;border:1px solid var(--line);border-radius:9px;background:#0a131e}.log b{font-size:10px}.log span{float:right;color:var(--muted);font-size:9px}.empty{padding:22px;text-align:center;color:var(--muted);font-size:11px}
+    .modal{position:fixed;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.68);padding:0}.modal.show{display:flex}.modal-card{width:min(560px,100%);max-height:92dvh;overflow:auto;border:1px solid var(--line);background:#0d1521;border-radius:20px 20px 0 0;box-shadow:0 -18px 60px rgba(0,0,0,.4);padding:14px}.modal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.close-x{width:34px;height:34px;border-radius:10px;background:#152538;color:var(--text);border:1px solid var(--line)}.hero{padding:12px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(135deg,#101e2c,#0b1723);margin-top:10px}.hero-name{font-size:19px;font-weight:900}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:9px}.detail{padding:8px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:#09131e}.detail b{display:block;font-size:12px}.detail span{font-size:9px;color:var(--muted)}.latency{margin-top:8px;font-size:10px;color:var(--muted)}
+    .setup-modal{align-items:center;padding:12px}.setup-modal .modal-card{border-radius:18px;width:min(520px,100%);box-shadow:0 22px 80px rgba(0,0,0,.55)}.setup-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:#102d27;border:1px solid #255c50;color:#b9f8e9;font-size:9px;font-weight:850;letter-spacing:.35px}.setup-title{font-size:20px;font-weight:900;margin-top:8px}.setup-copy{font-size:11px;color:var(--muted);margin-top:5px}.setup-error{display:none;margin-top:9px;padding:8px 9px;border-radius:9px;border:1px solid #69323d;background:#28151a;color:#ffc2ca;font-size:10px}.setup-error.show{display:block}
+    .footer-note{padding:9px 11px;color:var(--muted);font-size:9px;border-top:1px solid var(--line)}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}.controls{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){
+      .wrap{padding:10px 8px 24px}.top{align-items:flex-start}.title{font-size:13px}.sub{font-size:10px}.logo{width:36px;height:36px;flex-basis:36px;border-radius:11px}.status{font-size:9px;padding:6px 8px}
+      .panel{border-radius:14px}.panel-head{padding:11px 11px 9px}.panel-body{padding:9px 10px}.panel-head h2{font-size:13px}
+      .controls{grid-template-columns:1fr 1fr;gap:6px}.field input{padding:8px 9px;font-size:12px}.actions{gap:6px}.btn{padding:8px 9px;font-size:10px}
+      .table-wrap{display:none}.cards{display:block}.metrics{grid-template-columns:repeat(3,1fr)}.metric{padding:8px}.metric .v{font-size:14px}.metric .k{font-size:8px}.mini-grid{grid-template-columns:repeat(2,1fr)}
+      .modal{align-items:flex-end}.modal-card{max-height:88dvh;padding:12px;border-radius:18px 18px 0 0}.detail-grid{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><div class="logo">TF</div><div><div class="title">Toobit Funding Bot</div><div class="sub">Live funding scanner • low-latency execution</div></div></div>
+      <div class="status"><span id="dot" class="dot"></span><span id="conn">Connecting…</span></div>
+    </header>
+
+    <div id="notice" class="notice" style="margin-bottom:10px"><strong>Paper mode</strong> — live order routing is disabled.</div>
+
+    <section class="panel">
+      <div class="panel-head"><div><h2>Bot Controls</h2><div class="sub">Select a coin to see its funding time and leverage limits.</div></div><span id="modePill" class="pill">IDLE</span></div>
+      <div class="panel-body">
+        <div class="controls">
+          <div class="field"><label>Margin (USDT)</label><input id="margin" type="number" min="0.1" step="0.1" value="1"></div>
+          <div class="field"><label>Leverage</label><input id="lev" type="number" min="1" step="1" value="10"></div>
+          <div class="field"><label>Min funding (bps)</label><input id="minFunding" type="number" min="0" step="1" value="15"></div>
+          <div class="field"><label>Min net edge (bps)</label><input id="minEdge" type="number" min="0" step="1" value="5"></div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="start">START BOT</button>
+          <button class="btn" id="auto">AUTO OFF</button>
+          <button class="btn danger" id="panic">PANIC CLOSE</button>
+          <button class="btn" id="stop">STOP</button>
+          <button class="btn" id="apply">APPLY</button>
+          <button class="btn" id="tokenBtn">AUTH TOKEN</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <main class="stack">
+        <section class="panel">
+          <div class="panel-head"><div><h2>Top Funding Opportunities</h2><div class="sub">Tap any coin for full details and fast preparation.</div></div><span class="pill" id="count">0</span></div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>#</th><th>COIN</th><th>FUNDING</th><th>NEXT</th><th>SPREAD</th><th>NET</th><th>SCORE</th><th>SIDE</th><th></th></tr></thead>
+              <tbody id="rows"><tr><td colspan="9" class="empty">Waiting for live Toobit data…</td></tr></tbody>
+            </table>
+          </div>
+          <div id="cards" class="cards"><div class="empty">Waiting for live Toobit data…</div></div>
+          <div class="footer-note">Funding is only received/paid when the position is still open at settlement. Actual exchange/network latency cannot be guaranteed to 0.001 s.</div>
+        </section>
+      </main>
+
+      <aside class="stack">
+        <section class="panel"><div class="panel-head"><div><h2>Live Status</h2><div class="sub">Execution and risk</div></div></div><div class="panel-body">
+          <div class="metrics"><div class="metric"><div class="v" id="mContracts">—</div><div class="k">Contracts</div></div><div class="metric"><div class="v" id="mScore">—</div><div class="k">Best score</div></div><div class="metric"><div class="v" id="mClock">—</div><div class="k">Server offset</div></div></div>
+          <div style="height:8px"></div><div id="position"><div class="empty">No active position</div></div>
+        </div></section>
+
+        <section class="panel"><div class="panel-head"><div><h2>Execution Guard</h2><div class="sub">Server-side protection</div></div></div><div class="panel-body">
+          <div class="notice">• One position at a time<br>• Spread + net-edge filters<br>• Funding-time close is scheduled server-side<br>• Live leverage/margin can be prepared in advance<br>• Emergency close remains available</div>
+        </div></section>
+
+        <section class="panel"><div class="panel-head"><div><h2>Recent Trades</h2><div class="sub">Stored on the bot server</div></div></div><div class="panel-body"><div class="logs" id="history"><div class="empty">No trades yet</div></div></div></section>
+      </aside>
+    </div>
+  </div>
+
+  <div id="setupModal" class="modal setup-modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="setup-badge">FIRST OPEN SETUP</div>
+      <div class="setup-title">Enter your Bot Access Key</div>
+      <div class="setup-copy">This is the <strong>BOT_AUTH_TOKEN</strong> you set on the server (Render/VPS). It controls this dashboard. Your Toobit API key and secret stay on the server and are never stored in this HTML.</div>
+      <div style="margin-top:12px" class="field"><label>BOT ACCESS KEY</label><input id="setupToken" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste your server key"></div>
+      <div id="setupError" class="setup-error"></div>
+      <div class="actions"><button class="btn primary" id="setupSave">CONNECT &amp; OPEN</button></div>
+    </div>
+  </div>
+
+  <div id="coinModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-top"><div><div class="sub">SELECTED COIN</div><div id="dSymbol" class="hero-name">—</div></div><button class="close-x" id="closeCoin">×</button></div>
+      <div class="hero">
+        <div class="sub">Funding direction</div><div id="dSide" style="font-size:14px;font-weight:900">—</div>
+        <div class="detail-grid">
+          <div class="detail"><b id="dFunding">—</b><span>Current funding</span></div>
+          <div class="detail"><b id="dCountdown">—</b><span>Time until funding</span></div>
+          <div class="detail"><b id="dDate">—</b><span>Settlement time</span></div>
+          <div class="detail"><b id="dMaxLev">—</b><span>Max leverage</span></div>
+          <div class="detail"><b id="dSpread">—</b><span>Spread</span></div>
+          <div class="detail"><b id="dNet">—</b><span>Estimated net</span></div>
+          <div class="detail"><b id="dMinNotional">—</b><span>Min notional</span></div>
+          <div class="detail"><b id="dPrice">—</b><span>Best executable price</span></div>
+        </div>
+        <div class="latency">Low-latency path: prepare leverage/margin before the funding window; order request is sent immediately when triggered. A guaranteed 1 ms exchange fill is not technically controllable.</div>
+      </div>
+      <div class="controls" style="margin-top:9px;grid-template-columns:1fr 1fr">
+        <div class="field"><label>Margin for this coin</label><input id="dMargin" type="number" min="0.1" step="0.1" value="1"></div>
+        <div class="field"><label>Leverage for this coin</label><input id="dLev" type="number" min="1" step="1" value="10"></div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="prepare">PREPARE</button>
+        <button class="btn primary" id="openSelected">OPEN NOW</button>
+        <button class="btn" id="useMax">USE MAX LEVERAGE</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tokenModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-top"><div><div class="sub">DASHBOARD AUTH</div><div style="font-size:17px;font-weight:900">Bot token</div></div><button class="close-x" id="cancelToken">×</button></div>
+      <div style="margin-top:10px" class="field"><label>BOT ACCESS KEY (BOT_AUTH_TOKEN)</label><input id="token" type="password" autocomplete="off" placeholder="Paste server token"></div>
+      <div class="actions"><button class="btn primary" id="saveToken">SAVE TOKEN</button></div>
+    </div>
+  </div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  const state={token:sessionStorage.getItem('botToken')||'',snap:null,selected:null,ws:null};
+  let setupBusy=false;
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmtPct=v=>{const n=Number(v||0);return `${n>=0?'+':''}${n.toFixed(4)}%`};
+  const fmtMoney=v=>{const n=Number(v||0);return `$${n.toFixed(6)}`};
+  const countdown=ms=>{const s=Math.max(0,Math.floor(Number(ms||0)/1000));const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`};
+  const api=async(url,opts={})=>{const headers=new Headers(opts.headers||{});if(state.token)headers.set('Authorization',`Bearer ${state.token}`);const r=await fetch(url,{...opts,headers});let j=null;try{j=await r.json()}catch{}if(!r.ok||j?.ok===false)throw new Error(j?.error||`HTTP ${r.status}`);return j};
+  function setNotice(s){const n=$('notice');n.className=`notice ${s.liveTrading?'live':''} ${s.lastError?'bad':''}`;n.innerHTML=s.liveTrading?'<strong>LIVE MODE</strong> — real orders are enabled on the server.':s.lastError?`<strong>Feed issue:</strong> ${esc(s.lastError)}`:'<strong>Paper mode</strong> — live order routing is disabled.'}
+  function render(s){
+    state.snap=s; setNotice(s); $('modePill').textContent=s.auto?'AUTO ON':s.running?'RUNNING':'IDLE'; $('count').textContent=`${(s.candidates||[]).length} coins`; $('mContracts').textContent=s.contracts??'—'; $('mScore').textContent=s.candidates?.[0]?Number(s.candidates[0].score).toFixed(0):'—'; $('mClock').textContent=`${Math.round(Number(s.serverOffsetMs||0))} ms`;
+    const rows=s.candidates||[];
+    $('rows').innerHTML=rows.length?rows.map((c,i)=>{const next=c.nextFundingTime-(Date.now()+s.serverOffsetMs);return `<tr><td class="rank">${i+1}</td><td class="coin">${esc(c.symbol)}</td><td class="${c.fundingRate>=0?'pos':'neg'}">${fmtPct(c.fundingRate*100)}</td><td>${countdown(next)}</td><td>${Number(c.spreadBps).toFixed(2)} bps</td><td class="score">${Number(c.estimatedNetBps).toFixed(2)} bps</td><td>${Number(c.score).toFixed(0)}</td><td><span class="tag ${c.side.toLowerCase()}">${c.side}</span></td><td class="row-actions"><button onclick="selectCoin('${esc(c.symbol)}')">SELECT</button></td></tr>`}).join(''):'<tr><td colspan="9" class="empty">No live rows yet.</td></tr>';
+    $('cards').innerHTML=rows.length?rows.slice(0,20).map((c,i)=>{const next=c.nextFundingTime-(Date.now()+s.serverOffsetMs);return `<div class="coin-card"><div class="coin-main"><div><div class="coin-name">#${i+1} ${esc(c.symbol)}</div><div class="sub">${c.side} • max ${c.maxLeverage||'—'}×</div></div><div class="rate-big ${c.fundingRate>=0?'pos':'neg'}">${fmtPct(c.fundingRate*100)}</div></div><div class="mini-grid"><div class="mini"><b>${countdown(next)}</b><span>Next funding</span></div><div class="mini"><b>${Number(c.spreadBps).toFixed(2)} bps</b><span>Spread</span></div><div class="mini"><b>${Number(c.estimatedNetBps).toFixed(2)} bps</b><span>Est. net</span></div><div class="mini"><b>${Number(c.score).toFixed(0)}</b><span>Score</span></div></div><div class="coin-actions"><button class="btn" onclick="selectCoin('${esc(c.symbol)}')">SELECT</button></div></div>`}).join(''):'<div class="empty">No live rows yet.</div>';
+    if(s.position){const p=s.position;const left=Number(p.nextFundingTime||0)-(Date.now()+s.serverOffsetMs);$('position').innerHTML=`<div class="position"><div class="sub">ACTIVE ${p.paper?'PAPER':'LIVE'} POSITION</div><div class="big">${esc(p.symbol)} · ${esc(p.side)}</div><div class="kv"><div><b>${p.quantity}</b><span>Qty</span></div><div><b>${fmtMoney(p.notional)}</b><span>Notional</span></div><div><b>${p.leverage}×</b><span>Leverage</span></div><div><b>${countdown(left)}</b><span>Funding countdown</span></div></div></div>`}else $('position').innerHTML='<div class="empty">No active position</div>';
+    const hist=s.history||[];$('history').innerHTML=hist.length?hist.map(t=>`<div class="log"><b>${esc(t.symbol)} · ${esc(t.side)}</b><span>${new Date(t.closedAt||t.openedAt).toLocaleTimeString()}</span><div class="sub">${esc(t.reason||'—')} · ${t.paper?'paper':'live'}</div></div>`).join(''):'<div class="empty">No trades yet</div>';
+    if(state.selected){const fresh=rows.find(x=>x.symbol===state.selected.symbol);if(fresh)fillSelected(fresh)}
+    $('auto').textContent=s.auto?'AUTO ON':'AUTO OFF';
+  }
+  function fillSelected(c){state.selected=c;$('dSymbol').textContent=c.symbol;$('dSide').textContent=`${c.side} • funding receiver`;$('dFunding').textContent=fmtPct(c.fundingRate*100);$('dMaxLev').textContent=`${c.maxLeverage||'—'}×`;$('dSpread').textContent=`${Number(c.spreadBps).toFixed(2)} bps`;$('dNet').textContent=`${Number(c.estimatedNetBps).toFixed(2)} bps`;$('dMinNotional').textContent=fmtMoney(c.minNotional);$('dPrice').textContent=Number(c.price||0).toPrecision(10);$('dMargin').value=$('margin').value||'1';let current=Math.min(Number($('lev').value||10),Number(c.maxLeverage||200));if(!(current>=1))current=1;$('dLev').value=current;updateSelectedClock();}
+  function updateSelectedClock(){const c=state.selected;if(!c||!state.snap)return;const left=Number(c.nextFundingTime||0)-(Date.now()+Number(state.snap.serverOffsetMs||0));$('dCountdown').textContent=countdown(left);$('dDate').textContent=c.nextFundingTime?new Date(c.nextFundingTime).toLocaleString():'—';}
+  function showCoin(c){fillSelected(c);$('coinModal').classList.add('show');$('coinModal').setAttribute('aria-hidden','false')}
+  window.selectCoin=symbol=>{const c=(state.snap?.candidates||[]).find(x=>x.symbol===symbol);if(c)showCoin(c)};
+  function hideCoin(){$('coinModal').classList.remove('show');$('coinModal').setAttribute('aria-hidden','true');state.selected=null}
+  $('closeCoin').onclick=hideCoin;$('coinModal').addEventListener('click',e=>{if(e.target===$('coinModal'))hideCoin()});
+  $('useMax').onclick=()=>{if(state.selected)$('dLev').value=Number(state.selected.maxLeverage||1)};
+  $('prepare').onclick=async()=>{if(!state.selected)return;try{const r=await api('/api/bot/prepare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symbol:state.selected.symbol,leverage:Number($('dLev').value)})});render(r);alert(`Prepared ${state.selected.symbol} at ${r.selectedLeverage}×`)}catch(e){alert(e.message)}};
+  $('openSelected').onclick=async()=>{if(!state.selected)return;try{const r=await api('/api/bot/open',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symbol:state.selected.symbol,side:state.selected.side,marginUsdt:Number($('dMargin').value||1),leverage:Number($('dLev').value||1)})});render(r);hideCoin()}catch(e){alert(e.message)}};
+  $('apply').onclick=async()=>{try{render(await api('/api/bot/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({marginUsdt:Number($('margin').value),leverage:Number($('lev').value),minFundingBps:Number($('minFunding').value),minNetEdgeBps:Number($('minEdge').value)})}));alert('Settings applied.')}catch(e){alert(e.message)}};
+  $('start').onclick=async()=>{try{render(await api('/api/bot/start',{method:'POST'}))}catch(e){alert(e.message)}};
+  $('stop').onclick=async()=>{try{render(await api('/api/bot/stop',{method:'POST'}))}catch(e){alert(e.message)}};
+  $('auto').onclick=async()=>{try{render(await api('/api/bot/auto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:!state.snap?.auto})}))}catch(e){alert(e.message)}};
+  $('panic').onclick=async()=>{if(!state.snap?.position||!confirm('Close the active position now?'))return;try{render(await api('/api/bot/close',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason:'PANIC CLOSE'})}))}catch(e){alert(e.message)}};
+  function showSetup(message=''){ $('setupModal').classList.add('show'); $('setupModal').setAttribute('aria-hidden','false'); $('setupToken').value=state.token; $('setupError').textContent=message; $('setupError').classList.toggle('show',Boolean(message)); setTimeout(()=>$('setupToken').focus(),50); }
+  function hideSetup(){ $('setupModal').classList.remove('show'); $('setupModal').setAttribute('aria-hidden','true'); }
+  async function verifyToken(token){
+    const saved=state.token; state.token=token;
+    try { const s=await api('/api/private/status'); if(!s?.ok) throw new Error('Key rejected.'); sessionStorage.setItem('botToken',token); hideSetup(); render(s); return true; }
+    catch(e){ state.token=saved; throw e; }
+  }
+  $('setupSave').onclick=async()=>{ if(setupBusy)return; const token=$('setupToken').value.trim(); if(!token){$('setupError').textContent='Enter your BOT_AUTH_TOKEN first.';$('setupError').classList.add('show');return;} setupBusy=true; $('setupSave').disabled=true; try { await verifyToken(token); load(); } catch(e){ $('setupError').textContent=e.message||'Unable to connect. Check your server key.'; $('setupError').classList.add('show'); } finally { setupBusy=false; $('setupSave').disabled=false; } };
+  $('tokenBtn').onclick=()=>{$('token').value=state.token;$('tokenModal').classList.add('show')};$('cancelToken').onclick=()=>$('tokenModal').classList.remove('show');$('saveToken').onclick=async()=>{const token=$('token').value.trim();if(!token)return;try{await verifyToken(token);$('tokenModal').classList.remove('show')}catch(e){alert(e.message||'Invalid key')}};
+  async function load(){try{const s=await api('/api/public/market');if(s?.ok)render(s);if(!state.token)showSetup()}catch(e){$('conn').textContent='Auth / feed error';if(!state.token)showSetup();else if(String(e.message).toLowerCase().includes('unauthorized'))showSetup('Your saved key was rejected. Enter the current BOT_AUTH_TOKEN.')}}
+  function connect(){const proto=location.protocol==='https:'?'wss':'ws';const ws=new WebSocket(`${proto}://${location.host}/ws`);state.ws=ws;ws.onopen=()=>{$('dot').className='dot ok';$('conn').textContent='Live feed'};ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.payload)render(m.payload)}catch{}};ws.onclose=()=>{$('dot').className='dot';$('conn').textContent='Reconnecting…';setTimeout(connect,1000)}}
+  setInterval(()=>{if(state.snap)render(state.snap)},250);setInterval(load,2500);setInterval(updateSelectedClock,100);load();connect();
+</script>
+</body>
+</html>
