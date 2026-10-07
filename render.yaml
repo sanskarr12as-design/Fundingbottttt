@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: toobit-funding-bot
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TOOBIT_BASE_URL
+        value: https://api.toobit.com
+      - key: TOOBIT_API_KEY
+        sync: false
+      - key: TOOBIT_SECRET_KEY
+        sync: false
+      - key: BOT_AUTH_TOKEN
+        sync: false
+      - key: ENABLE_LIVE_TRADING
+        value: "false"
+      - key: ALLOW_LIVE_ORDERS
+        value: "false"
+      - key: DEFAULT_MARGIN_USDT
+        value: "1"
+      - key: DEFAULT_LEVERAGE
+        value: "10"
+      - key: MIN_NET_EDGE_BPS
+        value: "5"
+      - key: MIN_FUNDING_BPS
+        value: "15"
+      - key: MAX_SPREAD_BPS
+        value: "15"
+      - key: ENTRY_WINDOW_SEC
+        value: "30"
+      - key: CLOSE_DELAY_MS
+        value: "1"
